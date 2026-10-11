@@ -1,0 +1,20 @@
+# 密钥与本地数据（严禁上传）
+.env
+data/
+lightrag.log
+*.db
+webui.log
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# macOS
+.DS_Store
+
+# 知识库输入资料与生成的分类清单仅在本机保存
+/docs/*
+!/docs/.gitkeep
+/app/webui_cn/categories.json

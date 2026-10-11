@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>东青RAG知识库</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23356ae6'/%3E%3Cstop offset='1' stop-color='%237499df'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect x='4' y='4' width='56' height='56' rx='16' fill='none' stroke='url(%23g)' stroke-width='4'/%3E%3Ccircle cx='22' cy='24' r='5' fill='url(%23g)'/%3E%3Ccircle cx='42' cy='20' r='4' fill='url(%23g)'/%3E%3Ccircle cx='20' cy='42' r='4' fill='url(%23g)'/%3E%3Ccircle cx='42' cy='40' r='5.5' fill='url(%23g)'/%3E%3Cpath d='M22 24L42 20M22 24L20 42M42 20L42 40M20 42L42 40M22 24L42 40' stroke='url(%23g)' stroke-width='2.5' opacity='.9' fill='none'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="style.css?v=20261011">
+</head>
+<body>
+
+<!-- ══ 线框图标库（SVG sprite，0尺寸容器保证渐变可被引用）══ -->
+<svg xmlns="http://www.w3.org/2000/svg" width="0" height="0" style="position:absolute">
+  <defs>
+    <linearGradient id="logo-g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#356ae6"/><stop offset="1" stop-color="#7499df"/>
+    </linearGradient>
+  </defs>
+  <symbol id="i-dash" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/></symbol>
+  <symbol id="i-chat" viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></symbol>
+  <symbol id="i-folder" viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></symbol>
+  <symbol id="i-graph" viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></symbol>
+  <symbol id="i-plug" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="3"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/><line x1="20" y1="9" x2="23" y2="9"/><line x1="20" y1="14" x2="23" y2="14"/><line x1="1" y1="9" x2="4" y2="9"/><line x1="1" y1="14" x2="4" y2="14"/></symbol>
+  <symbol id="i-file" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></symbol>
+  <symbol id="i-node" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><circle cx="4" cy="5" r="2"/><circle cx="20" cy="5" r="2"/><circle cx="4" cy="19" r="2"/><circle cx="20" cy="19" r="2"/><line x1="6.5" y1="6.5" x2="9.5" y2="9.5"/><line x1="14.5" y1="9.5" x2="17.5" y2="6.5"/><line x1="6.5" y1="17.5" x2="9.5" y2="14.5"/><line x1="14.5" y1="14.5" x2="17.5" y2="17.5"/></symbol>
+  <symbol id="i-link" viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></symbol>
+  <symbol id="i-sliders" viewBox="0 0 24 24"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></symbol>
+  <symbol id="i-upload" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></symbol>
+  <symbol id="i-refresh" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></symbol>
+  <symbol id="i-max" viewBox="0 0 24 24"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></symbol>
+  <symbol id="i-ext" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></symbol>
+  <symbol id="i-pen" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></symbol>
+  <symbol id="i-chart" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></symbol>
+  <symbol id="i-calendar" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></symbol>
+  <symbol id="i-inbox" viewBox="0 0 24 24"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></symbol>
+  <symbol id="i-trash" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></symbol>
+  <symbol id="i-key" viewBox="0 0 24 24"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></symbol>
+</svg>
+
+<div class="app-shell">
+
+  <!-- ══ 左侧导航 ══ -->
+  <aside class="sidebar">
+    <div class="brand">
+      <svg class="logo" viewBox="0 0 64 64" aria-label="东青RAG知识库">
+        <rect x="4" y="4" width="56" height="56" rx="16" fill="none" stroke="url(#logo-g)" stroke-width="4"/>
+        <circle cx="22" cy="24" r="5" fill="url(#logo-g)"/>
+        <circle cx="42" cy="20" r="4" fill="url(#logo-g)"/>
+        <circle cx="20" cy="42" r="4" fill="url(#logo-g)"/>
+        <circle cx="42" cy="40" r="5.5" fill="url(#logo-g)"/>
+        <path d="M22 24L42 20M22 24L20 42M42 20L42 40M20 42L42 40M22 24L42 40"
+              stroke="url(#logo-g)" stroke-width="2.5" opacity=".9" fill="none"/>
+      </svg>
+      <div class="brand-text">
+        <strong>东青知识库</strong>
+        <span>KNOWLEDGE WORKSPACE</span>
+      </div>
+    </div>
+
+    <div class="nav-label">工作空间</div>
+    <nav class="side-nav" id="side-nav" aria-label="主要功能">
+      <button class="nav-item active" data-nav="dash"><svg class="ic"><use href="#i-dash"/></svg>总览驾驶舱</button>
+      <button class="nav-item" data-nav="chat"><svg class="ic"><use href="#i-chat"/></svg>对话问答<span class="nav-tip">RAG</span></button>
+      <button class="nav-item" data-nav="assets"><svg class="ic"><use href="#i-folder"/></svg>知识资产库<span class="nav-count" id="nav-doc-count"></span></button>
+      <button class="nav-item" data-nav="graph"><svg class="ic"><use href="#i-graph"/></svg>知识图谱</button>
+      <button class="nav-item" data-nav="models"><svg class="ic"><use href="#i-plug"/></svg>模型接入</button>
+    </nav>
+
+    <div class="nav-label">知识库状态</div>
+    <div class="side-kb" id="side-kb">
+      <div class="kb-row"><span>知识文档</span><b id="kb-docs">–</b></div>
+      <div class="kb-row"><span>图谱实体</span><b id="kb-entities">–</b></div>
+      <div class="kb-row"><span>知识关系</span><b id="kb-relations">–</b></div>
+      <div class="kb-status" id="kb-status-line"><i class="dot"></i>连接中…</div>
+    </div>
+
+    <div class="side-foot">
+      <button class="ghost-btn wide" id="btn-settings"><svg class="ic sm"><use href="#i-sliders"/></svg>工作空间设置</button>
+      <a class="ghost-btn wide" href="/docs" target="_blank" rel="noopener"><svg class="ic sm"><use href="#i-ext"/></svg>API 接口文档</a>
+      <div class="side-profile"><span class="profile-avatar">东</span><div><strong>我的知识空间</strong><small>让知识持续积累</small></div></div>
+    </div>
+  </aside>
+
+  <!-- ══ 主区域 ══ -->
+  <div class="main">
+
+    <header class="topbar">
+      <div class="breadcrumb"><span>工作空间</span><div class="page-title" id="page-title">总览驾驶舱</div></div>
+      <div class="badges">
+        <span class="badge" id="badge-health"><i class="dot"></i>连接中…</span>
+        <span class="badge" id="badge-model" hidden></span>
+        <span class="badge" id="badge-vdb" hidden></span>
+      </div>
+    </header>
+
+    <!-- ── 视图：总览驾驶舱 ── -->
+    <section class="page" id="view-dash">
+      <div class="greet-row">
+        <div>
+          <div class="hero-eyebrow"><i class="dot"></i><span id="greet-line">你好</span><span>，欢迎回到你的知识空间</span></div>
+          <h1>把资料，变成你的知识优势。</h1>
+          <p>收纳资料、发现关联，让每一次提问都有据可循。</p>
+        </div>
+        <div class="hero-tools">
+          <span class="date-chip" id="date-chip"></span>
+          <div class="hero-actions"><button class="ghost-btn" data-goto="assets"><svg class="ic sm"><use href="#i-upload"/></svg>上传资料</button><button class="primary-btn" data-goto="chat"><svg class="ic sm"><use href="#i-chat"/></svg>开始提问</button></div>
+        </div>
+      </div>
+
+      <div class="stat-grid">
+        <div class="stat-card"><div class="s-ic ic-indigo"><svg class="ic lg"><use href="#i-folder"/></svg></div><div class="s-tx"><span>知识文档</span><b id="st-docs">–</b><em id="st-docs-sub">全部入库资料</em></div></div>
+        <div class="stat-card"><div class="s-ic ic-cyan"><svg class="ic lg"><use href="#i-node"/></svg></div><div class="s-tx"><span>图谱实体</span><b id="st-entities">–</b><em>从资料中提炼</em></div></div>
+        <div class="stat-card"><div class="s-ic ic-violet"><svg class="ic lg"><use href="#i-link"/></svg></div><div class="s-tx"><span>知识关系</span><b id="st-relations">–</b><em>实体之间的连接</em></div></div>
+        <div class="stat-card"><div class="s-ic ic-amber"><svg class="ic lg"><use href="#i-sliders"/></svg></div><div class="s-tx"><span>待处理</span><b id="st-pending">–</b><em id="st-pending-sub">处理中 / 失败</em></div></div>
+      </div>
+
+      <div class="dash-cols">
+        <div class="dash-col">
+          <div class="panel">
+            <div class="p-head"><h3>知识库动态</h3><span class="p-sub">你的资料，正在积累价值</span></div>
+            <ul class="insight-list" id="insight-list"><li class="empty">加载中…</li></ul>
+          </div>
+          <div class="panel">
+            <div class="p-head"><h3>最近入库</h3><button class="link-btn" data-goto="assets">查看全部 →</button></div>
+            <ul class="recent-list" id="recent-list"><li class="empty">加载中…</li></ul>
+          </div>
+        </div>
+        <div class="dash-col">
+          <div class="panel">
+            <div class="p-head"><h3>从一个好问题开始</h3><span class="p-sub">快捷探索</span></div>
+            <ul class="hint-list">
+              <li data-ask="根据知识库现有内容，帮我总结核心要点"><svg class="ic sm"><use href="#i-file"/></svg>总结当前知识库内容</li>
+              <li data-ask="根据知识库内容，帮我生成一份今日工作日报"><svg class="ic sm"><use href="#i-calendar"/></svg>生成日报 / 周报</li>
+              <li data-ask="客户问：这个知识库怎么接入客服系统？请根据资料回答"><svg class="ic sm"><use href="#i-chat"/></svg>应对客户咨询</li>
+              <li data-ask="对比一下知识库里提到的不同方案，给出优劣势分析"><svg class="ic sm"><use href="#i-chart"/></svg>竞品 / 方案对比</li>
+              <li data-goto="assets"><svg class="ic sm"><use href="#i-upload"/></svg>上传新资料入库</li>
+              <li data-goto="graph"><svg class="ic sm"><use href="#i-graph"/></svg>查看知识网络</li>
+            </ul>
+          </div>
+          <div class="panel">
+            <div class="p-head"><h3>你的知识工作流</h3><span class="p-sub">四步开始</span></div>
+            <ul class="mini-guide">
+              <li><b>01 · 收纳资料</b><br>上传文档，让散落的资料集中到一个地方。</li>
+              <li><b>02 · 建立关联</b><br>等待文档处理完成，自动整理知识和关系。</li>
+              <li><b>03 · 带着问题探索</b><br>总结、对比或生成报告，查看回答的引用来源。</li>
+              <li><b>04 · 选择合适的模型</b><br>在「模型接入」中配置你的在线或本地模型。</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── 视图：对话问答 ── -->
+    <section class="page chat-page" id="view-chat" hidden>
+      <div class="chat-layout">
+        <div class="chat-panel">
+          <div class="scene-chips" id="scenes">
+            <button data-q="这个知识库里现在有什么内容？用要点列出"><svg class="ic sm"><use href="#i-search"/></svg>资料速览</button>
+            <button data-q="根据知识库内容，帮我生成一份今日工作日报模板"><svg class="ic sm"><use href="#i-calendar"/></svg>日报周报</button>
+            <button data-q="客户问：这个知识库怎么接入客服系统？请根据资料回答"><svg class="ic sm"><use href="#i-chat"/></svg>客户咨询</button>
+            <button data-q="总结知识库的核心方法论，做成学习笔记"><svg class="ic sm"><use href="#i-pen"/></svg>学习总结</button>
+          </div>
+          <div class="chat-log" id="chat-log">
+            <div class="chat-welcome">
+              <div class="welcome-mark"><svg class="ic"><use href="#i-chat"/></svg></div>
+              <h3>你的知识，随问随用。</h3>
+              <p>从一个问题开始，发现资料背后的答案与关联。<br>回答基于知识库检索，你可以继续查看引用来源。</p>
+            </div>
+          </div>
+          <div class="composer">
+            <div class="composer-opts">
+              <label>检索模式
+                <select id="mode">
+                  <option value="mix" selected>mix · 图谱+向量混合（推荐）</option>
+                  <option value="hybrid">hybrid · 图谱双路</option>
+                  <option value="local">local · 具体细节</option>
+                  <option value="global">global · 宏观概括</option>
+                  <option value="naive">naive · 纯向量</option>
+                </select>
+              </label>
+              <label class="switch"><input type="checkbox" id="only-ctx"><span>只看检索资料</span></label>
+            </div>
+            <div class="composer-row">
+              <textarea id="q" rows="2" placeholder="输入问题，Enter 发送 / Shift+Enter 换行"></textarea>
+              <button id="ask" class="primary-btn">发送</button>
+            </div>
+          </div>
+        </div>
+
+        <aside class="chat-side">
+          <div class="panel">
+            <div class="p-head"><h3>当前知识库</h3></div>
+            <div class="kb-overview">
+              <div class="kb-o-row"><span><svg class="ic sm"><use href="#i-folder"/></svg>知识文档</span><b id="co-docs">–</b></div>
+              <div class="kb-o-row"><span><svg class="ic sm"><use href="#i-node"/></svg>图谱实体</span><b id="co-entities">–</b></div>
+              <div class="kb-o-row"><span><svg class="ic sm"><use href="#i-link"/></svg>知识关系</span><b id="co-relations">–</b></div>
+              <div class="kb-o-row"><span><svg class="ic sm"><use href="#i-file"/></svg>已就绪</span><b id="co-ready">–</b></div>
+            </div>
+          </div>
+          <div class="panel">
+            <div class="p-head"><h3>快捷指令</h3><span class="p-sub">点击直接提问</span></div>
+            <ul class="hint-list">
+              <li data-ask="总结知识库里最近入库的内容"><svg class="ic sm"><use href="#i-file"/></svg>总结最近入库内容</li>
+              <li data-ask="找出知识库里相互关联的知识点，讲讲它们的关系"><svg class="ic sm"><use href="#i-search"/></svg>查找知识和关联</li>
+              <li data-ask="根据知识库内容写一篇宣传短文"><svg class="ic sm"><use href="#i-pen"/></svg>生成文章 / 报告</li>
+              <li data-ask="基于知识库，为一个新项目列一份行动方案"><svg class="ic sm"><use href="#i-chart"/></svg>为项目生成方案</li>
+              <li data-ask="分析一下知识库覆盖了哪些主题，还缺什么"><svg class="ic sm"><use href="#i-chart"/></svg>分析知识库趋势</li>
+            </ul>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- ── 视图：知识资产库 ── -->
+    <section class="page" id="view-assets" hidden>
+      <div class="panel assets-head">
+        <div>
+          <h2>知识资产库</h2>
+          <p>统一收纳所有资料：AI 自动切片、建图谱、向量化，随时可被精准调用。</p>
+        </div>
+        <button class="primary-btn" id="btn-upload"><svg class="ic sm"><use href="#i-upload"/></svg>上传资料</button>
+        <button class="ghost-btn" id="btn-retry-failed" hidden><svg class="ic sm"><use href="#i-refresh"/></svg>重试失败文档</button>
+      </div>
+
+      <div class="dropzone" id="dropzone">
+        <svg class="ic"><use href="#i-upload"/></svg><b>拖入资料，或点击选择文件</b><span>支持 Markdown、TXT、PDF、Word · 自动识别重复内容</span>
+        <input type="file" id="file-input" multiple accept=".md,.markdown,.txt,.pdf,.docx" hidden>
+      </div>
+
+      <div class="cat-tabs" id="cat-tabs">
+        <button class="cat active" data-cat="all">全部</button>
+        <button class="cat" data-cat="产品资产">产品资产</button>
+        <button class="cat" data-cat="行业知识">行业知识</button>
+        <button class="cat" data-cat="服务知识">服务知识</button>
+        <button class="cat" data-cat="创作成果">创作成果</button>
+        <button class="cat" data-cat="未分类">未分类</button>
+      </div>
+      <p class="cat-hint">分类规则：文件放入 docs/ 子目录（如 docs/产品资产/报价.pdf）后执行 make ingest，会自动归类入库并生成分类清单；网页上传的资料默认「未分类」。</p>
+
+      <div class="asset-grid" id="asset-grid"><div class="empty" style="grid-column:1/-1">加载中…</div></div>
+    </section>
+
+    <!-- ── 视图：知识图谱（自研 Canvas · Obsidian 风格）── -->
+    <section class="page graph-page" id="view-graph" hidden>
+      <div class="graph-toolbar">
+        <div class="graph-heading"><h2>发现知识之间的连接</h2><span class="sub" id="graph-stats">加载中…</span></div>
+        <div class="graph-actions">
+          <button class="ghost-btn" id="graph-refresh"><svg class="ic sm"><use href="#i-refresh"/></svg>刷新图谱</button>
+          <button class="ghost-btn" id="graph-fit"><svg class="ic sm"><use href="#i-max"/></svg>适应画布</button>
+          <a class="ghost-btn" href="/webui/#/graph" target="_blank" rel="noopener"><svg class="ic sm"><use href="#i-ext"/></svg>官方视图</a>
+        </div>
+      </div>
+      <div class="gwrap" id="graph-wrap">
+        <canvas id="graph-canvas"></canvas>
+        <div class="g-search">
+          <svg class="ic sm"><use href="#i-search"/></svg>
+          <input id="graph-search" placeholder="搜索知识节点…" aria-label="搜索知识节点">
+        </div>
+        <div class="g-legend" id="g-legend"></div>
+        <div class="g-zoom">
+          <button id="g-zin" aria-label="放大图谱">＋</button><button id="g-zout" aria-label="缩小图谱">－</button>
+          <span id="g-zoompct">100%</span>
+        </div>
+        <div class="g-stats" id="g-statline"></div>
+        <aside class="g-detail" id="g-detail" hidden></aside>
+        <div class="g-empty" id="g-empty" hidden>
+          <div class="ge-icon">🕸</div>
+          <div class="ge-title">知识网络等待生长</div>
+          <div class="ge-sub">完成「知识资产库」的资料入库后，这里会长出知识图谱</div>
+        </div>
+      </div>
+      <div class="graph-help"><span><svg class="ic sm"><use href="#i-graph"/></svg>拖动画布移动 · 滚轮缩放 · 点击节点查看来源</span><span>点击右侧类别，可聚焦同类知识</span></div>
+    </section>
+
+    <!-- ── 视图：模型接入 ── -->
+    <section class="page" id="view-models" hidden>
+      <div class="panel assets-head">
+        <div>
+          <h2>模型接入</h2>
+          <p>在这里填 URL 和密钥添加大模型 —— 添加后<b class="hl">直接接入本机知识库</b>（LightRAG 检索 + Milvus 向量），所有问答自动基于本地资料作答。</p>
+        </div>
+      </div>
+
+      <div class="panel" style="margin-bottom:12px">
+        <div class="p-head"><h3>当前生效</h3><span class="p-sub" id="mc-status">读取中…</span></div>
+        <div class="warn-banner" id="mc-warning" hidden></div>
+        <div class="cur-grid">
+          <div class="cur-card"><span><svg class="ic sm"><use href="#i-chat"/></svg>对话模型</span><b id="cur-llm">–</b><em id="cur-llm-host"></em></div>
+          <div class="cur-card"><span><svg class="ic sm"><use href="#i-node"/></svg>向量模型</span><b id="cur-emb">–</b><em id="cur-emb-host"></em></div>
+          <div class="cur-card"><span><svg class="ic sm"><use href="#i-folder"/></svg>向量库</span><b>Milvus</b><em id="cur-vdb">本地知识库已就绪</em></div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="p-head"><h3>添加 / 更换大模型</h3><span class="p-sub"><svg class="ic sm"><use href="#i-key"/></svg>密钥留空 = 保留现有密钥</span></div>
+        <div class="preset-row">
+          <span class="preset-label">快捷预设</span>
+          <button class="cat" data-preset="zhipu">智谱 GLM</button>
+          <button class="cat" data-preset="deepseek">DeepSeek</button>
+          <button class="cat" data-preset="qwen">通义 Qwen</button>
+          <button class="cat" data-preset="openai">OpenAI</button>
+          <button class="cat" data-preset="ollama">本地 Ollama</button>
+        </div>
+        <p class="cat-hint">⚠️ 提醒：对话中转站通常<b>没有向量模型渠道</b>。对话用中转站没问题，向量模型建议单独用智谱官方 Key（embedding-3）或硅基流动 Key（BAAI/bge-m3 免费）。</p>
+
+        <div class="form-grid">
+          <fieldset class="form-box">
+            <legend>对话模型（LLM）</legend>
+            <label>类型
+              <select id="llm-binding">
+                <option value="openai">在线 · OpenAI 兼容接口</option>
+                <option value="ollama">本地 · Ollama</option>
+              </select>
+            </label>
+            <label>接口地址 URL<input id="llm-host" placeholder="https://open.bigmodel.cn/api/paas/v4"></label>
+            <label>模型名称<input id="llm-model" placeholder="glm-4-flash"></label>
+            <label>模型密钥 API Key<input id="llm-key" type="password" placeholder="sk-…（留空保留现有）"></label>
+            <div class="test-row"><button class="ghost-btn" id="btn-test-llm"><svg class="ic sm"><use href="#i-plug"/></svg>测试连通</button><span class="test-result" id="test-llm-result"></span></div>
+          </fieldset>
+
+          <fieldset class="form-box">
+            <legend>向量模型（Embedding）</legend>
+            <label>类型
+              <select id="emb-binding">
+                <option value="openai">在线 · OpenAI 兼容接口</option>
+                <option value="ollama">本地 · Ollama</option>
+              </select>
+            </label>
+            <label>接口地址 URL<input id="emb-host" placeholder="同对话模型地址"></label>
+            <label>模型名称<input id="emb-model" placeholder="embedding-3"></label>
+            <label>模型密钥 API Key<input id="emb-key" type="password" placeholder="留空保留现有"></label>
+            <label>向量维度<input id="emb-dim" placeholder="2048"></label>
+            <div class="test-row"><button class="ghost-btn" id="btn-test-emb"><svg class="ic sm"><use href="#i-plug"/></svg>测试连通</button><span class="test-result" id="test-emb-result"></span></div>
+          </fieldset>
+        </div>
+
+        <div class="save-row">
+          <button class="primary-btn" id="btn-save-model">保存并生效</button>
+          <span class="hint" id="save-hint">保存后服务自动重启（约 20 秒），期间页面会提示重连；换向量模型会要求清库重灌。</span>
+        </div>
+      </div>
+    </section>
+
+  </div>
+</div>
+
+<dialog id="settings-dlg">
+  <h3>设置</h3>
+  <label>知识库 API 口令（服务端设置了 LIGHTRAG_API_KEY 时填写）
+    <input type="password" id="api-key" placeholder="留空 = 本机无口令">
+  </label>
+  <p class="hint">口令保存在本机浏览器，仅用于本页请求鉴权。</p>
+  <div class="dlg-actions">
+    <button class="ghost-btn" id="dlg-cancel">取消</button>
+    <button class="primary-btn" id="dlg-save">保存</button>
+  </div>
+</dialog>
+
+<script src="app.js?v=20261011-2"></script>
+</body>
+</html>
